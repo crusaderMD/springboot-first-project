@@ -1,5 +1,6 @@
 package com.example.springboot_first_project.service;
 
+import com.example.springboot_first_project.exception.ResourceNotFoundException;
 import com.example.springboot_first_project.model.Product;
 import com.example.springboot_first_project.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,9 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Optional<Product> getProduct(Long id) {
-        return productRepository.findById(id);
+    public Product getProduct(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found!"));
     }
 
     public Product saveProduct(Product product) {
@@ -29,6 +31,10 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
+
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product with ID " + id + " not found!");
+        }
         productRepository.deleteById(id);
     }
 }

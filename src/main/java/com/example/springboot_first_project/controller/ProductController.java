@@ -1,7 +1,9 @@
 package com.example.springboot_first_project.controller;
 
+import com.example.springboot_first_project.exception.ResourceNotFoundException;
 import com.example.springboot_first_project.model.Product;
 import com.example.springboot_first_project.service.ProductService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +25,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
-        return productService.getProduct(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+        try {
+            Product product = productService.getProduct(id);
+            return ResponseEntity.ok(product);
+        }
+        catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping
